@@ -14,7 +14,9 @@ public class Test {
 		System.out.println(DataPattern.isEmail("aaa@test.cn"));
 		//身份证号隐私，已经测试通过
 		
-		
+		System.out.println("格式数字：");
+		System.out.println(DataPattern.formatNumber(1234567.45678910,0));
+		System.out.println(DataPattern.formatNumber(1234567.45678910,7));
 	}
 	
 }

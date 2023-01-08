@@ -1,6 +1,7 @@
 package com.github.yinjinlong.datapattern;
 
 
+import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
 import java.io.BufferedReader;
@@ -47,6 +48,50 @@ public final class DataPattern {
 	 * 域名后缀，邮箱要满足
 	 */
 	private static final Set<String> name_suffixes = new HashSet<>(150);
+	
+	/**
+	 * 格式数字
+	 *
+	 * @param n     数字
+	 * @param scale 保留小数位
+	 * @return 格式结果或null
+	 */
+	public static String formatNumber(Number n, int scale) {
+		return formatNumber(n, 3, ",", scale);
+	}
+	
+	/**
+	 * 格式数字，分组
+	 *
+	 * @param n     数字
+	 * @param space 间隔，通常为3
+	 * @param ss    分隔符
+	 * @param scale 保留小数位
+	 * @return 格式后字符串或null（包含非数字）
+	 */
+	@Nullable
+	public static String formatNumber(@NotNull Number n, final int space, @NotNull final String ss, int scale) {
+		if (n == null || space < 1 || scale < 0 || ss == null)
+			return null;
+		String num = n.toString();
+		if (!num.matches("\\d+\\.?\\d+"))
+			return num;
+		String        z = num;
+		StringBuilder x;
+		if (num.contains(".")) {
+			z = num.substring(0, num.indexOf("."));
+			x = new StringBuilder(num.substring(num.indexOf(".") + 1));
+		} else
+			x = new StringBuilder("0");
+		if (x.length() < scale)
+			while (x.length() < scale)
+				x.append('0');
+		else
+			x = new StringBuilder(x.substring(0, scale));
+		//noinspection RegExpSimplifiable
+		return z.replaceAll("(?=\\B(\\d{"+space+"})+$)", ss) + (scale == 0 ? "" : "." + x.toString().replaceAll("(?<=^(\\d{" + space + "})+\\B)", ss));
+	}
+	
 	
 	/**
 	 * 是否为身份证号（大致格式）
@@ -112,7 +157,7 @@ public final class DataPattern {
 		if (text == null || !email.matcher(text).matches())
 			return false;
 		String suffix = text.toString();
-		return name_suffixes.contains(suffix.substring(suffix.lastIndexOf(".")+1));
+		return name_suffixes.contains(suffix.substring(suffix.lastIndexOf(".") + 1));
 	}
 	
 	/**

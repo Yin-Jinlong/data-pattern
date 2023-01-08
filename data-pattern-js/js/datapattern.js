@@ -1,19 +1,18 @@
-const DT = (function () {
+// noinspection JSUnusedGlobalSymbols,ES6ConvertVarToLetConst
+
+const DT = (() => {
     const suffixes = ["com", "net", "cn", "info", "xin", "club", "xyz", "ltd", "co", "wang", "top", "vip", "beer", "art", "cloud", "site", "shop", "fun", "link", "online", "tech", "ren", "luxe", "pro", "kim", "work", "red", "ink", "group", "store", "host", "pub", "live", "wiki", "design", "video", "fit", "yoga", "biz", "org", "name", "cc", "tv", "mobi", "asia", "在线", "网址", "网店", "商城", "中文网", "公司", "网络", "我爱你", "餐厅", "中国", "中国", "集团", "com", "cn", "net", "cc", "biz", "公司", "网络", "bid", "loan", "click", "gift", "pics", "photo", "men", "pw", "news", "win", "party", "date", "trade", "science", "website", "space", "press", "rocks", "band", "engineer", "market", "social", "software", "lawyer", "studio", "mom", "lol", "game", "games", "help", "me", "vc", "so", "tel", "hk", "hk", "商标", "love", "plus", "today", "gold", "city", "show", "run", "world", "icu", "广东", "佛山", "life", "招聘", "fans", "bar", "cool", "游戏", "zone", "购物", "law", "fund", "email", "team", "center", "guru"];
-    const phone_reg = /(\+(00)?86 ?)?1([38][0-9]|4[57]|[59][0-35-9]|6[25-7]|7[0135-8]) ?\d{4} ?\d{4}/;
-    const email_reg = /\w+@\w+\.\w{2,8}/;
-    const idNum_reg = /(\d{6})(19\d{2}|20[012]\d)(0\d|1[12])([012]\d|3[01])(\d{3})(\d|X|x)/;
     return {
         isPhone(text) {
-            const r = phone_reg.exec(text);
+            var r = /(\+(00)?86 ?)?1([38][0-9]|4[57]|[59][0-35-9]|6[25-7]|7[0135-8]) ?\d{4} ?\d{4}/.exec(text);
             return r ? r[0] === text : false;
         },
         isEmail(text) {
-            const r = email_reg.exec(text);
+            const r = /\w+@\w+\.\w{2,8}/.exec(text);
             return r ? r[0] === text ? suffixes.indexOf(text.substring(text.lastIndexOf(".") + 1)) > -1 : false : false;
         },
         isIdNumber(text) {
-            const r = idNum_reg.exec(text);
+            var r = /(\d{6})(19\d{2}|20[012]\d)(0\d|1[12])([012]\d|3[01])(\d{3})(\d|X|x)/.exec(text);
             if (!r || r[0] !== text)
                 return false;
             text = text.toUpperCase();
@@ -52,7 +51,7 @@ const DT = (function () {
                         if (date > 32)
                             return false;
                 }
-                const today = new Date();
+                var today = new Date();
                 var dd = new Date();
                 dd.setFullYear(year);
                 dd.setMonth(month - 1);
@@ -60,6 +59,28 @@ const DT = (function () {
                 return today.getTime() > dd.getTime() && year - today.getFullYear() < 120;
             }
             return false;
+        },
+        formatNumber(num, scale, space = 3, ss = ',') {
+            if (!num || !ss || ss.length < 1 || scale < 0 || space < 0)
+                return num;
+            num = num.toString();
+            if (/\d+\.?\d+/.exec(num).toString() !== num)
+                return num;
+            var z = num;
+            var x;
+            var index = num.indexOf('.');
+            if (index > 1) {
+                z = num.substring(0, index);
+                x = num.substring(index + 1);
+            } else
+                x = '0';
+            if (x.length < scale)
+                while (x.length < scale)
+                    x += '0';
+            else
+                x = x.substring(0, scale);
+            return z.replaceAll(new RegExp('(?=\\B(\\d{' + space + '})+$)', 'g'), ss) +
+                (scale === 0 ? '' : '.' + x.replaceAll(new RegExp('(?<=^(\\d{' + space + '})+\\B)', 'g'), ss));
         }
     };
-}())
+})()
