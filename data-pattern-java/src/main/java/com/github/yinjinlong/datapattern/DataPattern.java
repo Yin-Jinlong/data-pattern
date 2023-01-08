@@ -3,10 +3,13 @@ package com.github.yinjinlong.datapattern;
 
 import com.sun.istack.internal.Nullable;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -39,6 +42,11 @@ public final class DataPattern {
 	 * 身份证行政区划代码集合，至1980起
 	 */
 	private static final Properties idReginMappings = new Properties();
+	
+	/**
+	 * 域名后缀，邮箱要满足
+	 */
+	private static final Set<String> name_suffixes = new HashSet<>(150);
 	
 	/**
 	 * 是否为身份证号（大致格式）
@@ -101,7 +109,10 @@ public final class DataPattern {
 	 * @return 匹配结果，成功为true否则false
 	 */
 	public static boolean isEmail(@Nullable CharSequence text) {
-		return text != null && email.matcher(text).matches();
+		if (text == null || !email.matcher(text).matches())
+			return false;
+		String suffix = text.toString();
+		return name_suffixes.contains(suffix.substring(suffix.lastIndexOf(".")));
 	}
 	
 	/**
@@ -164,10 +175,11 @@ public final class DataPattern {
 	public static void loadDataFiles() {
 		if (loaded)
 			return;
-		InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("data-pattern/id-num-data.zip");
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream inputStream = classLoader.getResourceAsStream("data-pattern/id-num-data.zip");
 		if (inputStream == null)
 			throw new RuntimeException("Can't read file:data-pattern/id-num-data.zip");
-		try (ZipInputStream in = new ZipInputStream(inputStream);) {
+		try (ZipInputStream in = new ZipInputStream(inputStream)) {
 			ZipEntry next;
 			while ((next = in.getNextEntry()) != null) {
 				String name = next.getName();
@@ -179,13 +191,30 @@ public final class DataPattern {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		inputStream = classLoader.getResourceAsStream("data-pattern/name-suffix.zip");
+		if (inputStream == null)
+			throw new RuntimeException("Can't read file:data-pattern/name-suffix.zip");
+		try (ZipInputStream in = new ZipInputStream(inputStream)) {
+			ZipEntry next;
+			while ((next = in.getNextEntry()) != null) {
+				if (!(next.getName().matches("naame-sufix.txt")))
+					continue;
+				BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+				String         line;
+				while ((line = reader.readLine()) != null)
+					if (line.length() > 0)
+						name_suffixes.add(line);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		loaded = true;
 	}
 	
 	static {
 		phone = Pattern.compile("(\\+(00)?86)?1([38][0-9]|4[57]|[59][0-35-9]|6[25-7]|7[0135-8])\\d{8}");
 		idNum_pre_pattern = Pattern.compile("(\\d{6})(19\\d{2}|20[012]\\d)(0\\d|1[12])([012]\\d|3[01])(\\d{3})(\\d|X|x)");
-		email = Pattern.compile("\\w+@\\w+\\.\\w+");
+		email = Pattern.compile("\\w+@\\w+\\.\\w{2,8}");
 	}
 	
 	/**
