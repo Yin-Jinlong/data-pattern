@@ -112,7 +112,7 @@ public final class DataPattern {
 		if (text == null || !email.matcher(text).matches())
 			return false;
 		String suffix = text.toString();
-		return name_suffixes.contains(suffix.substring(suffix.lastIndexOf(".")));
+		return name_suffixes.contains(suffix.substring(suffix.lastIndexOf(".")+1));
 	}
 	
 	/**
@@ -197,7 +197,7 @@ public final class DataPattern {
 		try (ZipInputStream in = new ZipInputStream(inputStream)) {
 			ZipEntry next;
 			while ((next = in.getNextEntry()) != null) {
-				if (!(next.getName().matches("naame-sufix.txt")))
+				if (!(next.getName().matches("name-suffix.txt")))
 					continue;
 				BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 				String         line;
