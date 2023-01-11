@@ -16,22 +16,21 @@ const DT = (() => {
             if (!r || r[0] !== text)
                 return false;
             text = text.toUpperCase();
-            var sum = (text[0] + text[10] - 96) * 7 +
-                (text[1] + text [11] - 96) * 9 +
-                (text[2] + text [12] - 96) * 10 +
-                (text[3] + text [13] - 96) * 5 +
-                (text[4] + text [14] - 96) * 8 +
-                (text[5] + text [15] - 96) * 4 +
-                (text[6] + text [16] - 96) * 2 +
-                (text[7] - '0') +
-                (text[8] - '0') * 6 +
-                (text[9] - '0') * 3;
+            var sum = (+text[0] + +text[10]) * 7 +
+                (+text[1] + +text [11]) * 9 +
+                (+text[2] + +text [12]) * 10 +
+                (+text[3] + +text [13]) * 5 +
+                (+text[4] + +text [14]) * 8 +
+                (+text[5] + +text [15]) * 4 +
+                (+text[6] + +text [16]) * 2 +
+                (+text[7]) +
+                (+text[8]) * 6 +
+                (+text[9]) * 3;
             sum = (12 - sum % 11) % 11;
-            if (sum === 10 ? text[17] === 'X' : text[17] = '0' === sum
-            ) {
-                const year = parseInt(text.substring(6, 10));
-                const month = parseInt(text.substring(11, 12));
-                var date = parseInt(text.substring(13, 14));
+            if (sum === 10 ? text[17] === 'X' : +text[17] === sum) {
+                const year = +text.substring(6, 10);
+                const month = +text.substring(11, 12);
+                var date = +text.substring(13, 14);
                 switch (month) {
                     case 4:
                     case 6:
