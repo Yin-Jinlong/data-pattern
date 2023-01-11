@@ -157,7 +157,7 @@ public final class DataPattern {
 		if (text == null || !email.matcher(text).matches())
 			return false;
 		String suffix = text.toString();
-		return name_suffixes.contains(suffix.substring(suffix.lastIndexOf(".") + 1));
+		return name_suffixes.contains(suffix.substring(suffix.lastIndexOf(".") + 1).toLowerCase());
 	}
 	
 	/**

@@ -9,7 +9,7 @@ const DT = (() => {
         },
         isEmail(text) {
             const r = /\w+@\w+\.\w{2,8}/.exec(text);
-            return r ? r[0] === text ? suffixes.indexOf(text.substring(text.lastIndexOf(".") + 1)) > -1 : false : false;
+            return r ? r[0] === text ? suffixes.indexOf(text.toLowerCase().substring(text.lastIndexOf(".") + 1)) > -1 : false : false;
         },
         isIdNumber(text) {
             var r = /(\d{6})(19\d{2}|20[012]\d)(0\d|1[12])([012]\d|3[01])(\d{3})(\d|X|x)/.exec(text);
