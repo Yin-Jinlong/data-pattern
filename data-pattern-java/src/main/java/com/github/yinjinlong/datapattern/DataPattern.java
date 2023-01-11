@@ -77,19 +77,18 @@ public final class DataPattern {
 		if (!num.matches("\\d+\\.?\\d+"))
 			return num;
 		String        z = num;
-		StringBuilder x;
+		StringBuilder x = new StringBuilder();
 		if (num.contains(".")) {
 			z = num.substring(0, num.indexOf("."));
-			x = new StringBuilder(num.substring(num.indexOf(".") + 1));
-		} else
-			x = new StringBuilder("0");
+			x.append(num.substring(num.indexOf(".") + 1));
+		}
 		if (x.length() < scale)
 			while (x.length() < scale)
 				x.append('0');
 		else
-			x = new StringBuilder(x.substring(0, scale));
+			x.setLength(scale);
 		//noinspection RegExpSimplifiable
-		return z.replaceAll("(?=\\B(\\d{"+space+"})+$)", ss) + (scale == 0 ? "" : "." + x.toString().replaceAll("(?<=^(\\d{" + space + "})+\\B)", ss));
+		return z.replaceAll("(?=\\B(\\d{" + space + "})+$)", ss) + (scale == 0 ? "" : "." + x.toString().replaceAll("(?<=^(\\d{" + space + "})+\\B)", ss));
 	}
 	
 	
@@ -139,8 +138,7 @@ public final class DataPattern {
 					if (date > 32)
 						return false;
 			}
-			Calendar today = Calendar.getInstance();
-			Calendar cal   = Calendar.getInstance();
+			Calendar today = Calendar.getInstance(), cal = Calendar.getInstance();
 			cal.set(year, month - 1, date);
 			return today.after(cal) && year - today.get(Calendar.YEAR) < 120;
 		}
